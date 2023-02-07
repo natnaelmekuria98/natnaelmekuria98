@@ -7,8 +7,8 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 openai.api_key = " "  #here you have to use your own openAI API key
 
 # set up the Telegram bot
-bot = telegram.Bot(token='6007228593:AAESmIC9Ym3lFAd9Awu0AlU7WwrJXg-idms')    #here you have to use your own telegram token
-updater = Updater(token='6007228593:AAESmIC9Ym3lFAd9Awu0AlU7WwrJXg-idms', use_context=True)
+bot = telegram.Bot(token='')    #here you have to use your own telegram token
+updater = Updater(token='', use_context=True)
 dispatcher = updater.dispatcher
 
 def start(update, context):
