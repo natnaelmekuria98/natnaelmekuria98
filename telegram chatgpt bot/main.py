@@ -1,48 +1,30 @@
-# important library must be install 
-import openai   
-import requests
-import json
+#Import some important library
+import openai
+import telegram
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
-# Initialize the OpenAI API key
-openai.api_key = "your_openai.api_key"   # opeAI API secret key
+# set up the OpenAI API key
+openai.api_key = " "  #here you have to use your own openAI API key
 
-# Define a function to generate the response from ChatGPT
-def generate_response(prompt):
-    completions = openai.Completion.create(
-        engine="text-davinci-002",
-        prompt=prompt,
-        max_tokens=1024,
-        n=1,
-        stop=None,
-        temperature=0.5,
-    )
+# set up the Telegram bot
+bot = telegram.Bot(token='6007228593:AAESmIC9Ym3lFAd9Awu0AlU7WwrJXg-idms')    #here you have to use your own telegram token
+updater = Updater(token='6007228593:AAESmIC9Ym3lFAd9Awu0AlU7WwrJXg-idms', use_context=True)
+dispatcher = updater.dispatcher
 
-    message = completions.choices[0].text
-    return message
+def start(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Wellcome To ChatGPT Telegram Chatbot.You can ask me any questions you want and i am ready to answer")
 
-# Define a function to handle the incoming messages from Telegram
-def handle_message(message):
-    response = generate_response(message)
-    return response
+def echo(update, context):
+    user_input = update.message.text
+    response = openai.Completion.create(engine="text-davinci-002", prompt=f"{user_input}")
+    response = response.choices[0].text
+    context.bot.send_message(chat_id=update.effective_chat.id, text=response)
 
-# Define a function to send a message to Telegram
-def send_message(chat_id, message):
-    #url = f"https://api.telegram.org/bot<your_telegram_bot_token>/sendMessage?chat_id={chat_id}&text={message}"  #telegram bot token
-    url = f"https://api.telegram.org/bot<your_telegram_bot-token>/sendMessage?chat_id={chat_id}&text={message}"  #telegram bot token
-    requests.get(url)
+start_handler = CommandHandler("start", start)
+echo_handler = MessageHandler(Filters.text, echo)
+dispatcher.add_handler(start_handler)
+dispatcher.add_handler(echo_handler)
 
-# Define the main function to run the Telegram Bot
-def lambda_handler(event, context):
-    body = json.loads(event["body"])
-    message = body["message"]["text"]
-    chat_id = body["message"]["chat"]["id"]
-
-    response = handle_message(message)
-    send_message(chat_id, response)
-
-    return {
-        "statusCode": 200,
-        "body": json.dumps({}),
-    }
+updater.start_polling()
 
 
